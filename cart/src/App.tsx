@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import {
+  CART_ADD_EVENT,
+  readCartItems,
+  writeCartItems,
+} from "@shared/cart-contract";
 
 type CartItem = {
   id: string;
@@ -8,23 +13,16 @@ type CartItem = {
   quantity: number;
 };
 
-const DEMO_ITEMS: CartItem[] = [
-  {
-    id: "p1",
-    name: "Wireless Mouse",
-    price: 29,
-    quantity: 1,
-  },
-  {
-    id: "p2",
-    name: "Mechanical Keyboard",
-    price: 89,
-    quantity: 2,
-  },
-];
-
 function App() {
-  const [items, setItems] = useState<CartItem[]>(DEMO_ITEMS);
+  const [items, setItems] = useState<CartItem[]>(() => readCartItems());
+
+  useEffect(() => {
+    const onAdd = () => setItems(readCartItems());
+
+    window.addEventListener(CART_ADD_EVENT, onAdd);
+    return () => window.removeEventListener(CART_ADD_EVENT, onAdd);
+  }, []);
+
   const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -33,12 +31,15 @@ function App() {
 
   const removeItem = (id: string) => {
     const next = items.filter((item) => item.id !== id);
+    writeCartItems(next);
     setItems(next);
   };
 
   const clearCart = () => {
+    writeCartItems([]);
     setItems([]);
   };
+
   return (
     <div className="app">
       <header className="header">

@@ -1,6 +1,6 @@
 import { useState } from "react";
-
 import "./App.css";
+import { addProductToCart } from "@shared/cart-contract";
 
 type Product = {
   id: string;
@@ -18,27 +18,35 @@ const PRODUCTS: Product[] = [
 ];
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [message, setMessage] = useState("");
+
+  const addToCart = (product: Product) => {
+    addProductToCart(product);
+    setMessage(`Added "${product.name}"`);
+  };
 
   return (
     <div className="app">
       <header className="header">
         <div>
-          <p className="eyeBrow">Products MFE - standalone</p>
+          <p className="eyebrow">Products MFE · standalone</p>
           <h1>Products</h1>
         </div>
       </header>
+
       <main className="main">
+        {message ? <p className="toast">{message}</p> : null}
+
         <div className="grid">
-          {PRODUCTS.map((product) => {
-            return (
-              <article className="card" key={product.id}>
-                <h2>{product.name}</h2>
-                <p className="price">${product.price}</p>
-                <button type="button">Add to cart</button>
-              </article>
-            );
-          })}
+          {PRODUCTS.map((product) => (
+            <article key={product.id} className="card">
+              <h2>{product.name}</h2>
+              <p className="price">${product.price}</p>
+              <button type="button" onClick={() => addToCart(product)}>
+                Add to Cart
+              </button>
+            </article>
+          ))}
         </div>
       </main>
     </div>

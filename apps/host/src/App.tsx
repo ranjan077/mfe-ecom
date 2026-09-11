@@ -1,83 +1,94 @@
-import { useState, lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import "./App.css";
-
-type Page = "home" | "products" | "cart";
 
 const ProductList = lazy(() => import("products/ProductList"));
 const Cart = lazy(() => import("cart/Cart"));
 
+const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+  isActive ? "shell-nav-link is-active" : "shell-nav-link";
+
+function RemoteFallback({ name }: { name: string }) {
+  return (
+    <p className="shell-loading">
+      <span className="shell-spinner" aria-hidden="true" />
+      Loading {name} remote…
+    </p>
+  );
+}
+
+function Home() {
+  return (
+    <section className="shell-panel">
+      <p className="shell-eyebrow">Host / Shell</p>
+      <h1>Microshop</h1>
+      <p className="shell-lede">
+        This shell composes independently deployed microfrontends at runtime
+        with Module Federation. Pick a section to load its remote on demand.
+      </p>
+
+      <div className="shell-remote-grid">
+        <article className="shell-remote-card">
+          <h2>Products</h2>
+          <p>
+            Catalog remote · <span className="shell-port">:3001</span>
+          </p>
+        </article>
+        <article className="shell-remote-card">
+          <h2>Cart</h2>
+          <p>
+            Cart remote · <span className="shell-port">:3002</span>
+          </p>
+        </article>
+      </div>
+    </section>
+  );
+}
+
 function App() {
-  const [, setPage] = useState<Page>("home");
   return (
     <BrowserRouter>
-      <div className="app">
-        <header>
-          <strong>Microshop</strong>
-          <nav className="nav">
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                isActive ? "nav link active" : "nav-link"
-              }
-              onClick={() => setPage("home")}
-            >
+      <div className="app-shell">
+        <header className="shell-header">
+          <NavLink to="/" className="shell-brand">
+            <span className="shell-brand-mark" aria-hidden="true">
+              M
+            </span>
+            Microshop
+          </NavLink>
+
+          <nav className="shell-nav" aria-label="Main">
+            <NavLink to="/" end className={navLinkClass}>
               Home
             </NavLink>
-            <NavLink
-              to="/products"
-              end
-              className={({ isActive }) => {
-                return isActive ? "nav link active" : "nav-link";
-              }}
-              onClick={() => setPage("products")}
-            >
+            <NavLink to="/products" className={navLinkClass}>
               Products
             </NavLink>
-            <NavLink
-              type="button"
-              to="/cart"
-              end
-              className={({ isActive }) => {
-                return isActive ? "nav link active" : "nav-link";
-              }}
-              onClick={() => setPage("cart")}
-            >
+            <NavLink to="/cart" className={navLinkClass}>
               Cart
             </NavLink>
           </nav>
         </header>
-        <main className="main">
+
+        <main className="shell-main">
           <Routes>
-            <Route
-              path="/"
-              element={
-                <section className="panel">
-                  <h1>Host/Shell</h1>
-                </section>
-              }
-            ></Route>
+            <Route path="/" element={<Home />} />
             <Route
               path="/products"
               element={
-                <Suspense
-                  fallback={
-                    <p className="loading">Loading Products remote...</p>
-                  }
-                >
+                <Suspense fallback={<RemoteFallback name="Products" />}>
                   <ProductList />
                 </Suspense>
               }
-            ></Route>
+            />
             <Route
               path="/cart"
               element={
-                <Suspense>
+                <Suspense fallback={<RemoteFallback name="Cart" />}>
                   <Cart />
                 </Suspense>
               }
-            ></Route>
+            />
           </Routes>
         </main>
       </div>

@@ -1,107 +1,270 @@
-:root {
-  --bg: #f4f6f8;
-  --surface: #ffffff;
-  --text: #15202b;
-  --muted: #5b6b7c;
-  --border: #d7dee7;
-  --brand: #0f766e;
-  --brand-soft: #ccfbf1;
-  --shadow: 0 1px 2px rgb(15 23 42 / 6%), 0 8px 24px rgb(15 23 42 / 6%);
+/*
+ * Host shell styles.
+ *
+ * Two rules keep the shell from fighting the remotes it renders:
+ *
+ * 1. Every class is prefixed `shell-`. The remotes ship their own global CSS
+ *    using generic names (app, header, main, panel, card, eyebrow), so an
+ *    unprefixed shell class silently collides with whichever loads last.
+ * 2. Tokens are namespaced `--shell-*` and declared on .app-shell, not :root.
+ *    Each remote declares its own :root palette, which would otherwise
+ *    overwrite the shell's variables the moment that remote loads.
+ *
+ * Colour is set on shell-owned blocks only, never on .app-shell as a whole:
+ * remotes render inside .shell-main and must not inherit the shell's text
+ * colour while keeping their own backgrounds.
+ */
+.app-shell {
+  --shell-bg: #f6f8fa;
+  --shell-surface: #ffffff;
+  --shell-raised: #f1f5f9;
+  --shell-text: #0f172a;
+  --shell-muted: #64748b;
+  --shell-border: #e2e8f0;
+  --shell-brand: #0f766e;
+  --shell-on-brand: #ffffff;
+  --shell-ring: rgb(15 118 110 / 35%);
+  --shell-shadow: 0 1px 2px rgb(15 23 42 / 6%), 0 8px 24px rgb(15 23 42 / 8%);
+  --shell-header-bg: rgb(255 255 255 / 80%);
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  background: var(--shell-bg);
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  text-align: left;
 }
 
-* {
+@media (prefers-color-scheme: dark) {
+  .app-shell {
+    --shell-bg: #0b1120;
+    --shell-surface: #0f172a;
+    --shell-raised: #1e293b;
+    --shell-text: #e2e8f0;
+    --shell-muted: #94a3b8;
+    --shell-border: #1e293b;
+    --shell-brand: #2dd4bf;
+    --shell-on-brand: #042f2e;
+    --shell-ring: rgb(45 212 191 / 35%);
+    --shell-shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 35%);
+    --shell-header-bg: rgb(15 23 42 / 80%);
+  }
+}
+
+.shell-header,
+.shell-header *,
+.shell-panel,
+.shell-panel * {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--text);
-  background: var(--bg);
-}
+/* ---------- header ---------- */
 
-button {
-  font: inherit;
-}
-
-.app {
-  min-height: 100vh;
-}
-
-.header {
+.shell-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.85rem 1.25rem;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  padding: 0.75rem clamp(1rem, 4vw, 2rem);
+  color: var(--shell-text);
+  background: var(--shell-header-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--shell-border);
 }
 
-.brand {
-  font-size: 1rem;
-  letter-spacing: 0.02em;
+.shell-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--shell-text);
+  text-decoration: none;
 }
 
-.nav {
+.shell-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 9px;
+  background: var(--shell-brand);
+  color: var(--shell-on-brand);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.shell-brand:focus-visible,
+.shell-nav-link:focus-visible {
+  outline: 2px solid var(--shell-ring);
+  outline-offset: 2px;
+}
+
+/* ---------- nav ---------- */
+
+.shell-nav {
   display: flex;
-  gap: 0.35rem;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 11px;
+  background: var(--shell-raised);
+  border: 1px solid var(--shell-border);
 }
 
-.nav-link {
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--muted);
-  padding: 0.45rem 0.8rem;
+.shell-nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.85rem;
   border-radius: 8px;
-  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--shell-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 120ms ease, background-color 120ms ease;
 }
 
-.nav-link:hover {
-  color: var(--text);
-  background: #eef2f6;
+.shell-nav-link:hover {
+  color: var(--shell-text);
+  background: var(--shell-surface);
 }
 
-.nav-link.active {
-  color: var(--brand);
-  background: var(--brand-soft);
-  border-color: #99f6e4;
+.shell-nav-link.is-active {
+  color: var(--shell-on-brand);
+  background: var(--shell-brand);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 12%);
 }
 
-.main {
-  max-width: 920px;
+/* ---------- main ---------- */
+
+.shell-main {
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 1.5rem 1.25rem 2.5rem;
+  padding: clamp(1.25rem, 4vw, 2.25rem) clamp(1rem, 4vw, 2rem) 3rem;
 }
 
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.25rem 1.35rem;
-  box-shadow: var(--shadow);
+.shell-panel {
+  background: var(--shell-surface);
+  border: 1px solid var(--shell-border);
+  border-radius: 16px;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  box-shadow: var(--shell-shadow);
 }
 
-.panel h1 {
+.shell-eyebrow {
   margin: 0 0 0.5rem;
-  font-size: 1.45rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--shell-brand);
 }
 
-.panel p {
+.shell-panel h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--shell-text);
+}
+
+.shell-lede {
   margin: 0;
-  line-height: 1.55;
-  color: var(--muted);
+  max-width: 60ch;
+  line-height: 1.6;
+  color: var(--shell-muted);
 }
 
-.muted {
-  color: var(--muted);
+.shell-remote-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.75rem;
 }
 
-.meta {
-  margin: 1rem 0 0;
-  padding-left: 1.1rem;
-  color: var(--text);
-  line-height: 1.7;
+.shell-remote-card {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--shell-border);
+  border-radius: 12px;
+  background: var(--shell-raised);
+}
+
+.shell-remote-card h2 {
+  margin: 0 0 0.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--shell-text);
+}
+
+.shell-remote-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--shell-muted);
+}
+
+.shell-port {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--shell-brand);
+}
+
+/* ---------- loading ---------- */
+
+.shell-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 3rem 0;
+  color: var(--shell-muted);
+  font-size: 0.9rem;
+}
+
+.shell-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--shell-border);
+  border-top-color: var(--shell-brand);
+  border-radius: 50%;
+  animation: shell-spin 700ms linear infinite;
+}
+
+@keyframes shell-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell-spinner {
+    animation-duration: 3s;
+  }
+
+  .shell-nav-link {
+    transition: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell-nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .shell-nav-link {
+    flex: 1;
+    justify-content: center;
+  }
 }

@@ -11,12 +11,30 @@ apps/
   products/        Products MFE – product catalog and details (:3001)
   cart/            Cart MFE – shopping cart and selected products (:3002)
 packages/
-  shared/          @shared/components – shared cart events, types and storage helpers
+  shared/          @shared/components – cart slice, store factory and typed hooks
 ```
 
 The apps are wired together with Module Federation (`@module-federation/vite`).
 `products` exposes `./ProductList`, `cart` exposes `./Cart`, and `host` consumes
-both from their `remoteEntry.js`. React and React DOM are shared singletons.
+both from their `remoteEntry.js`.
+
+### Shared state
+
+The host owns a single Redux Toolkit store (`apps/host/src/store.ts`) and provides
+it above the router, so both remotes read and dispatch against it with no props.
+The cart slice, store factory and typed hooks live in `@shared/components` — not
+in the host — so remotes never depend on the host and can still run standalone.
+
+`react`, `react-dom` and **`react-redux`** are shared singletons. `react-redux`
+must stay a singleton: it creates its context at module scope, so a second copy
+in the page gives the remotes a different context object than the host's
+`<Provider>` and they throw on mount. Keep the `shared` block identical in all
+three `vite.config.ts` files.
+
+Each remote's `main.tsx` builds its own store for standalone dev; the exposed
+`App.tsx` deliberately contains no `<Provider>`, so there is exactly one store
+whether the app runs standalone or federated. State is in-memory, so the cart
+resets on a page refresh.
 
 ## Getting started
 

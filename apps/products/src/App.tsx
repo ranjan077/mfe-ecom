@@ -1,12 +1,7 @@
 import { useState } from "react";
 import "./App.css";
-import { addProductToCart } from "@shared/components";
-
-type Product = {
-  id: string;
-  name: string;
-  price: number;
-};
+import { addItem, useAppDispatch } from "@shared/components";
+import type { CartAddDetail as Product } from "@shared/components";
 
 const PRODUCTS: Product[] = [
   { id: "p1", name: "Wireless Mouse", price: 29 },
@@ -19,9 +14,10 @@ const PRODUCTS: Product[] = [
 
 function App() {
   const [message, setMessage] = useState("");
+  const dispatch = useAppDispatch();
 
   const addToCart = (product: Product) => {
-    addProductToCart(product);
+    dispatch(addItem(product));
     setMessage(`Added "${product.name}"`);
   };
 

@@ -1,44 +1,22 @@
-import { useEffect, useState } from "react";
 import "./App.css";
 import {
-  CART_ADD_EVENT,
-  readCartItems,
-  writeCartItems,
+  clearCart as clearCartAction,
+  removeItem as removeItemAction,
+  selectCartCount,
+  selectCartItems,
+  selectCartTotal,
+  useAppDispatch,
+  useAppSelector,
 } from "@shared/components";
 
-type CartItem = {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-};
-
 function App() {
-  const [items, setItems] = useState<CartItem[]>(() => readCartItems());
+  const items = useAppSelector(selectCartItems);
+  const totalCount = useAppSelector(selectCartCount);
+  const totalPrice = useAppSelector(selectCartTotal);
+  const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    const onAdd = () => setItems(readCartItems());
-
-    window.addEventListener(CART_ADD_EVENT, onAdd);
-    return () => window.removeEventListener(CART_ADD_EVENT, onAdd);
-  }, []);
-
-  const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-
-  const removeItem = (id: string) => {
-    const next = items.filter((item) => item.id !== id);
-    writeCartItems(next);
-    setItems(next);
-  };
-
-  const clearCart = () => {
-    writeCartItems([]);
-    setItems([]);
-  };
+  const removeItem = (id: string) => dispatch(removeItemAction(id));
+  const clearCart = () => dispatch(clearCartAction());
 
   return (
     <div className="app">

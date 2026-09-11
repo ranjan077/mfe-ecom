@@ -4,7 +4,7 @@ import {
   CART_ADD_EVENT,
   readCartItems,
   writeCartItems,
-} from "@shared/cart-contract";
+} from "@shared/components";
 
 type CartItem = {
   id: string;

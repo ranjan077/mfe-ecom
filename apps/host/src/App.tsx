@@ -8,7 +8,7 @@ const ProductList = lazy(() => import("products/ProductList"));
 const Cart = lazy(() => import("cart/Cart"));
 
 function App() {
-  const [page, setPage] = useState<Page>("home");
+  const [, setPage] = useState<Page>("home");
   return (
     <BrowserRouter>
       <div className="app">

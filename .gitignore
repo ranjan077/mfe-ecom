@@ -1,4 +1,11 @@
-
 node_modules/
 dist/
 .env
+.env.*.local
+
+# turborepo
+.turbo/
+
+# typescript incremental build info
+.tsbuildinfo/
+*.tsbuildinfo

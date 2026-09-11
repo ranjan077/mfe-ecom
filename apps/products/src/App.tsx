@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./App.css";
-import { addProductToCart } from "@shared/cart-contract";
+import { addProductToCart } from "@shared/components";
 
 type Product = {
   id: string;
